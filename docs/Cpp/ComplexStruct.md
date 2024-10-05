@@ -387,7 +387,7 @@ offset of member5: 8
 
 如果我们写成`#pragma pack()`，也就是括号内不写对齐数，那么就会取消掉前面我们用`#pragma pack(n)`设置的默认对齐数，还原成编译器的默认设置。
 
-除此之外我们还可以用`__attribute__`关键字设置内存对齐，参照[下面的内容](C-basic.md#__attribute__)。注意`__attribute__`关键字是GNU对ISO C的扩展，支持GCC, Clang等编译器，VS默认的MSVC是不支持的。如果你的代码要在不同编译器下编译，需要用宏定义判断编译器做好处理。
+除此之外我们还可以用`__attribute__`关键字设置内存对齐，参照[GNU扩展的设置内存对齐](/Cpp/GNUattributeVariable#设置内存对齐)。注意`__attribute__`关键字是gnu对iso c的扩展，支持gcc, clang等编译器，vs默认的msvc是不支持的。如果你的代码要在不同编译器下编译，需要用宏定义判断编译器做好处理。
 
 为什么要把内存对齐讲的这么细呢？~~因为面试会问~~
 
@@ -397,15 +397,15 @@ offset of member5: 8
 
 ## 位域(bit field)
 
-> [C Bit Fields | Microsoft Learn](https://learn.microsoft.com/en-us/cpp/c-language/c-bit-fields?view=msvc-170)
+> [c bit fields | microsoft learn](https://learn.microsoft.com/en-us/cpp/c-language/c-bit-fields?view=msvc-170)
 >
-> [C++ struct 位域 | 拾荒志](https://murphypei.github.io/blog/2019/06/struct-bit-field)
+> [c++ struct 位域 | 拾荒志](https://murphypei.github.io/blog/2019/06/struct-bit-field)
 >
-> [【结构体内功修炼】结构体实现位段（二）_C语言_Albert Edison_InfoQ写作社区](https://xie.infoq.cn/article/d63013a03e86ece67f3aedbc9)（这个文章有个小歧义，就是位域成员应该是整形类型，不单是`int`和`unsigned int`，要是说扩充`int`到`char short long`也不是不行）
+> [【结构体内功修炼】结构体实现位段（二）_c语言_albert edison_infoq写作社区](https://xie.infoq.cn/article/d63013a03e86ece67f3aedbc9)（这个文章有个小歧义，就是位域成员应该是整形类型，不单是`int`和`unsigned int`，要是说扩充`int`到`char short long`也不是不行）
 
 位域是将数据以位的形式存储成员，并可以按位操作操作成员。好处显而易见，可以节省存储空间。位域的声明格式是：`类型 成员名称 : 位数`。例如下面的结构体：
 
-``` C
+``` c
 struct foo {
     int id : 8;
     int result : 4;
@@ -417,7 +417,7 @@ struct foo {
 
 访问位域成员与访问普通结构体成员是一样的。那么如果位域成员溢出了会发生什么呢？会影响其他成员吗？多说无用，来段代码：
 
-``` C
+``` c
 #include <stdio.h>
 
 struct foo {
@@ -449,7 +449,7 @@ id = 125, result = 4, temperature = 78
 
 位域定义的位数不能超过其声明的类型大小，比如：
 
-``` C
+``` c
 struct foo {
     signed char field1: 9;
     signed short field2: 20;
@@ -459,10 +459,10 @@ struct foo {
 编译结果：
 
 ``` bash
-E:/C-Learn/main.c:2:17: error: width of 'field1' exceeds its type
+e:/c-learn/main.c:2:17: error: width of 'field1' exceeds its type
      signed char field1: 9;
                  ^~~~~~
-E:/C-Learn/main.c:3:18: error: width of 'field2' exceeds its type
+e:/c-learn/main.c:3:18: error: width of 'field2' exceeds its type
      signed short field2: 20;
                   ^~~~~~
 ```
@@ -473,7 +473,7 @@ E:/C-Learn/main.c:3:18: error: width of 'field2' exceeds its type
 
 需要注意的是位域只能用整数，不可以用浮点与指针：
 
-``` C
+``` c
 struct foo {
     float fp8: 8;
     int *ptr4: 4;
@@ -484,20 +484,20 @@ struct foo {
 编译结果：
 
 ``` bash
-E:/C-Learn/main.c:2:11: error: bit-field 'fp8' has invalid type
+e:/c-learn/main.c:2:11: error: bit-field 'fp8' has invalid type
      float fp8 : 8;
            ^~~
-E:/C-Learn/main.c:3:10: error: bit-field 'ptr4' has invalid type
+e:/c-learn/main.c:3:10: error: bit-field 'ptr4' has invalid type
      int *ptr4 : 4;
           ^~~~
-E:/C-Learn/main.c:4:12: error: bit-field 'fp16' has invalid type
+e:/c-learn/main.c:4:12: error: bit-field 'fp16' has invalid type
      double fp16 : 16;
             ^~~~
 ```
 
 位域成员可以跨越两个存储空间，也就是说如果第一个空间的位置不够了，可以自动存到下一个空间。比如：
 
-``` C
+``` c
 #include <stdio.h>
 
 struct foo {
@@ -524,8 +524,8 @@ sizeof struct foo: 4
 
 那么位域的应用有那些呢？下面是nginx的一部分代码片段，可以看到这个结构体用到了位域。这个项目中有非常多地方用到位域。
 
-``` C
-/* https://github.com/nginx/nginx/blob/00637cce366f17b78fe1ed5c1ef0e534143045f6/src/http/ngx_http_core_module.h#L234 */
+``` c
+/* https://github.com/nginx/nginx/blob/00637cce366f17b78fe1ed5c1ef0e534143045f6/src/http/ngx_http_core_module.h#l234 */
 struct ngx_http_addr_conf_s {
     /* the default server configuration for this address:port */
     ngx_http_core_srv_conf_t  *default_server;
