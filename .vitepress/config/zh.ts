@@ -11,7 +11,7 @@ export const zh = defineConfig({
         nav: nav(),
 
         sidebar: {
-            '/Cpp/': { base: '/Cpp/', items: sidebarCpp() },
+            '/C/': { base: '/C/', items: sidebarC() },
             '/SoftwareSkill': { base: '/SoftwareSkill/', items: sidebarSoftwareSkill() },
             '/Embedded/': { base: '/Embedded/', items: sidebarEmbedded() },
             '/Linux/': { base: '/Linux/', items: sidebarLinux() },
@@ -50,18 +50,18 @@ export const zh = defineConfig({
 
 function nav(): DefaultTheme.NavItem[] {
     return [
-        { text: 'C/C++', link: '/Cpp' },
+        { text: 'C语言', link: '/C' },
         { text: '软件开发技巧', link: '/SoftwareSkill' },
         { text: '嵌入式', link: '/Embedded' },
         { text: 'Linux', link: '/Linux' },
     ]
 }
 
-function sidebarCpp(): DefaultTheme.SidebarItem[] {
+function sidebarC(): DefaultTheme.SidebarItem[] {
     return [
         { text: '这里有什么？', link: 'index.md' },
         {
-            text: 'C运算符',
+            text: '运算符',
             items: [
                 { text: '位运算', link: 'bit-calc.md' },
             ]

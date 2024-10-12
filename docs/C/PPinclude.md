@@ -35,7 +35,7 @@ E:/C-Learn/main.c:2:5: note: include '<stdio.h>' or provide a declaration of 'pr
 
 好了废话这么多，也该进入正题了。`#include`命令就是用来包含一些文件的，就是**把包含文件的内容全部放到我这个文件来**，这样我就可以直接用这个文件的内容了，不需要我复制粘贴一遍。理清楚这一点非常重要，编译器就是这样干的。下面用一个图简单的说一下，左边在`main.c`中包含后编译完的结果跟右边是一样的：
 
-![include_header](/Cpp/include_header.png)
+![include_header](/C/include_header.png)
 
 `#include`也可以包含`.c`文件，但是我并不推荐你这么做。用`#include`包含的文件编译器会在包含列表中寻找的，源文件会添加到编译列表中编译。假如有两个文件，`file1.c, file2.c`，如果你**既在`file1.c`中`#include "file2.c"`，又把`file2.c`添加到编译列表**，那么`file2.c`会被编译两次。编译`file1.c`的时候编译器一看，哦有个`#include <file2.c>`，我把`file2.c`编译一下加到`file1.o`里面；编译完`file2.c`生成`file2.o`；然后链接器链接这两个`.o`文件的时候一看，诶怎么`file1.o`的东西`file2.o`也有？你这里有两个我到底链接那一个？然后抛出错误说重复定义了。如果能明白我上面说的想必这个也非常好理解。
 

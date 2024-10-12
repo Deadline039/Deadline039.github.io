@@ -6,8 +6,8 @@ hero:
   text: "Hi there, 欢迎访问我的知识库"
   actions:
     - theme: brand
-      text: C/C++
-      link: /Cpp
+      text: C语言
+      link: /C
     - theme: brand
       text: 软件开发技巧
       link: /SoftwareSkill

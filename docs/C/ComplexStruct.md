@@ -267,23 +267,23 @@ offset of member5: 16
 
 `member1`: 结构体第一个成员，偏移量为0，存在第0个位置：
 
-![struct_align1](/Cpp/struct_align_1.png)
+![struct_align1](/C/struct_align_1.png)
 
 `member2`: `int8_t`类型，自身大小1，默认对齐数8，对齐数取较小值为1。1是1的倍数，偏移量为1，存在第1个位置：
 
-![struct_align2](/Cpp/struct_align_2.png)
+![struct_align2](/C/struct_align_2.png)
 
 `member3`: `uint32_t`类型，自身大小4，默认对齐数8，对齐数取较小值为4。 **3不是4的倍数，往前移动到4，** 偏移量为4，存在第4个位置：
 
-![struct_align3](/Cpp/struct_align_3.png)
+![struct_align3](/C/struct_align_3.png)
 
 `member4`: `uint16_t`类型，自身大小2，默认对齐数8，对齐数取较小值为2。8是2的倍数，偏移量为8，存在第8个位置：
 
-![struct_align4](/Cpp/struct_align_4.png)
+![struct_align4](/C/struct_align_4.png)
 
 `member5`: `uint64_t`类型，自身大小8，默认对齐数8，对齐数取较小值为8。 **10不是8的倍数，往前移动到16，** 偏移量为16，存在第16个位置：
 
-![struct_align5](/Cpp/struct_align_5.png)
+![struct_align5](/C/struct_align_5.png)
 
 最大对齐数是8，因此结构体总大小为24。
 
@@ -387,7 +387,7 @@ offset of member5: 8
 
 如果我们写成`#pragma pack()`，也就是括号内不写对齐数，那么就会取消掉前面我们用`#pragma pack(n)`设置的默认对齐数，还原成编译器的默认设置。
 
-除此之外我们还可以用`__attribute__`关键字设置内存对齐，参照[GNU扩展的设置内存对齐](/Cpp/GNUattributeVariable#设置内存对齐)。注意`__attribute__`关键字是gnu对iso c的扩展，支持gcc, clang等编译器，vs默认的msvc是不支持的。如果你的代码要在不同编译器下编译，需要用宏定义判断编译器做好处理。
+除此之外我们还可以用`__attribute__`关键字设置内存对齐，参照[GNU扩展的设置内存对齐](/C/GNUattributeVariable#设置内存对齐)。注意`__attribute__`关键字是gnu对iso c的扩展，支持gcc, clang等编译器，vs默认的msvc是不支持的。如果你的代码要在不同编译器下编译，需要用宏定义判断编译器做好处理。
 
 为什么要把内存对齐讲的这么细呢？~~因为面试会问~~
 

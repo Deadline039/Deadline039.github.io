@@ -139,7 +139,7 @@ u8_num address 0x000000000061FDEB, align: 1
 
 `alignof()`宏用来获取对齐数。可以看到，如果不指定对齐，那么将会按照变量自身大小对齐。下面来分析下变量在内存里是怎么存的（省略前面的一堆0）：
 
-![attribute_variable_aligned](/Cpp/attribute_variable_aligned.png)
+![attribute_variable_aligned](/C/attribute_variable_aligned.png)
 
 两个函数的局部变量的类型、数量、顺序都是一样的。区别在于`aalign_test`函数会对`s16_aligned`变量进行对齐，而`no_align_test`不会对`s16_no_aligned`变量对齐。根据输出的地址，可以看到如果不指定对齐，那么三个局部变量是紧挨在一起的。如果指定对齐，`s16_aligned`变量的地址就会在`0x61FDE0`上，**`0x61FDEC`不能被16也就是`0x10`整除，而`0x61FDE0`可以被16整除。**
 
