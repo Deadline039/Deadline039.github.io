@@ -64,6 +64,7 @@ function sidebarC(): DefaultTheme.SidebarItem[] {
             text: '运算符',
             items: [
                 { text: '位运算', link: 'bit-calc.md' },
+                { text: '运算优先级', link: 'priority-calc.md' },
             ]
         },
         {

@@ -2,7 +2,7 @@
 
 > [Storage of basic types | Microsoft Learn](https://learn.microsoft.com/en-us/cpp/c-language/storage-of-basic-types?view=msvc-170)
 > 
-> C大师 022-031
+> C大师 016 022-031
 
 整数可谓是在程序中最常用的一种数据类型。但是，整数是有范围的，如果超出了其存储范围就会溢出。
 
