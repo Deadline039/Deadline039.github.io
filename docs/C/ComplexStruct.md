@@ -273,7 +273,7 @@ offset of member5: 16
 
 ![struct_align2](/C/struct_align_2.png)
 
-`member3`: `uint32_t`类型，自身大小4，默认对齐数8，对齐数取较小值为4。 **3不是4的倍数，往前移动到4，** 偏移量为4，存在第4个位置：
+`member3`: `uint32_t`类型，自身大小4，默认对齐数8，对齐数取较小值为4。 **2不是4的倍数，往前移动到4，** 偏移量为4，存在第4个位置：
 
 ![struct_align3](/C/struct_align_3.png)
 
