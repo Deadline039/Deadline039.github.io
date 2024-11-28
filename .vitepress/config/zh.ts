@@ -92,13 +92,7 @@ function sidebarC(): DefaultTheme.SidebarItem[] {
                 { text: '#define与条件编译', link: 'PPdefine.md' },
             ]
         },
-        {
-            text: '函数调用约定',
-            link: 'CallingConvention.md',
-            items: [
-                { text: '如何指定调用约定', link: 'CCSpecific.md' },
-            ]
-        },
+        { text: '函数调用约定', link: 'CallingConvention.md' },
         {
             text: 'GNU扩展',
             link: 'GNUCExtension.md',

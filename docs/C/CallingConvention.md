@@ -8,7 +8,7 @@
 
 函数调用约定是指一个函数调用另一个函数参数传递方式以及返回结果方式的约定。他主要规定：
 
-- 参数如何压栈
+- 参数压栈顺序
 - 调用前谁来压栈，调用后谁来清栈
 - 返回值如何返回
 
@@ -21,3 +21,16 @@
 - `nakedcall`
 
 下面的内容需要一点x86和ARM汇编的知识。可参照：[X86汇编基础 - Hackeyes | Hackeye](https://hackeyes.github.io/2021/04/22/X86%E6%B1%87%E7%BC%96%E5%9F%BA%E7%A1%80/), [arm汇编语言学习笔记 | 安和桥南丶的博客](https://chan-shaw.github.io/2020/03/20/arm%E6%B1%87%E7%BC%96%E8%AF%AD%E8%A8%80%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/)
+
+## 如何指定调用约定
+
+在函数名前加`__callName`。例如:
+
+``` C
+int __stdcall function(int param1, int param2)
+int __cdecl function(int param1, int param2)
+int __thiscall function(int param1, int param2)
+```
+
+## `__stdcall`
+
