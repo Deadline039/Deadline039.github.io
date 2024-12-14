@@ -1,6 +1,8 @@
 # `#include`
 
 > C大师 184 249 250
+>
+> [Header Files (The C Preprocessor)](https://gcc.gnu.org/onlinedocs/cpp/Header-Files.html)
 
 我想大部分人的第一个C语言程序都是输出`Hello, world! `吧，总是固定的`#include <stdio.h>`，仿佛就像英语的固定搭配一样贯穿整个C语言的学习过程。其实如果要深入`#include`，非常复杂，涉及多文件编程、项目架构设计等知识，需要一些CMake的知识，这里只是简单提一下，如果不理解没关系，隔段时间再来看看。
 
@@ -65,6 +67,10 @@ E:/C-Learn/main.c:2:5: note: include '<stdio.h>' or provide a declaration of 'pr
 > 这里要注意编译器是按源文件编译列表去**逐个编译**，并不是把所有文件全部放到一起去编译。如果把所有文件都放在一起，只修改了一个源文件，而去编译所有源文件，这显然会增加编译时间，而且也不合理。尤其是一些例如Chrome, Linux之类大型项目，光编译就要几个小时，根本等不起。
 
 ## 头文件路径
+
+> [Include Syntax (The C Preprocessor)](https://gcc.gnu.org/onlinedocs/cpp/Include-Syntax.html)
+>
+> [Search Path (The C Preprocessor)](https://gcc.gnu.org/onlinedocs/cpp/Search-Path.html)
 
 我们知道，`#include`可以用尖括号与引号两种方式。在我以前的的印象中，尖括号是用来包含诸如`stdio.h`这类的C库文件的，引号用来包括我们自己的头文件。但尖括号真的只能用来包括C库文件吗？当然不是。
 
@@ -162,7 +168,7 @@ void moduleB(void) {
 }
 ```
 
-`main.c`就一个`main`函数，而且只有一个`retrun 0`，这里我们主要看编译结果。
+`main.c`就一个`main`函数，而且只有一个`return 0`，这里我们主要看编译结果。
 
 ``` bash
 ubuntu@hi3798mv100:~/C-Learn/build$ cmake ..
@@ -362,17 +368,60 @@ ubuntu@hi3798mv100:~/C-Learn/build$
 
 > 这里稍微说明一下，两个点代表上一级目录。`include_directories`下只有`moduleA`文件夹，根据上面的文件树结构，要想在`moduleA`文件夹下访问`moduleB.h`，就需要回退到上一级目录，进入`moduleB`文件夹，因此就是`../moduleB/moduleB.h`
 
-## `#include_next`
+## 判断头文件是否存在
 
-> [Wrapper Headers (The C Preprocessor)](https://gcc.gnu.org/onlinedocs/cpp/Wrapper-Headers.html)
+> [__has_include (The C Preprocessor)](https://gcc.gnu.org/onlinedocs/cpp/_005f_005fhas_005finclude.html)
 
-如果你阅读过GCC头文件源码，应该还会发现`#include_next`这样一个指令。这个指令是来自GNU的扩展，VS默认的MSVC不支持。那这个指令是干什么的呢？其实上面GNU的文档已经说的比较明白了。下面我只是简单的翻译一下。
+怎么判断头文件是否存在？我们可以用`__has_include`这个预处理命令来判断，注意这个命令的意思是**头文件是否可以被访问到**，而不是头文件有没有被包含。使用这个命令可以避免一些编译错误，以处理头文件丢失的情况。
 
-假如你的项目中已经有一个头文件`A.h`了，但是`A.h`不能满足需求，我想修改`A.h`的内容。我没有权限直接修改或删除`A.h`。最主要的问题是还必须得用`A.h`这个文件名，而且还得用旧的`A.h`里的内容。那这怎么办呢？先不管其他的创建一个`A.h`再说。创建后怎么处理旧的`A.h`？有下面几个问题：
+还是上一节的文件结构，我们在`main.c`里这样写：
 
-- 在新的头文件中直接包含旧的`A.h`，即`#include "A.h"`。但这有个问题，头文件一般都会做编译保护，引入旧的`A.h`可能不会被编译；如果删除了编译保护，两个文件将会无限`#include`循环导致编译错误
-- 在新的头文件中用绝对路径包含旧的`A.h`，这不会产生上面的问题，但是如果文件被移动，或者其他系统没有这个文件也不能编译
+``` C
+/**
+ * @file    main.c
+ * @author  Deadline039
+ * @brief   Main function.
+ * @version 1.0
+ * @date    2024-12-13
+ */
 
-在ISO C中无法解决这个问题，但是可以用GNU的扩展指令，`#include_next "filename"`。意思是去包含目录里找下一个叫`filename`的文件。它跟`#include`很像，但是不同的一点是不会有上面所说的编译保护问题。
+#ifdef __has_include
 
-虽然可以用这个方法修改一些只读头文件的内容，但是GNU并不推荐你这么做，这会造成很大的混乱。我现在引用的这个东西，是来自新的`A.h`？还是旧的`A.h`。除非你的别无它法的时候才能用这个指令。
+#if __has_include(<moduleA.h>)
+#pragma message "Found moduleA.h! "
+#include <moduleA.h>
+#endif /* __has_include(<moduleA.h>) */
+
+#if __has_include(<moduleB.h>)
+#pragma message "Found moduleB.h! "
+#else  /* __has_include(<moduleB.h>) */
+#warning "Can not found moudleB.h, use balabala instead. "
+#endif /* __has_include(<moduleB.h>) */
+
+#endif /* __has_include */
+
+int main(void) {
+
+    return 0;
+}
+```
+
+编译结果：
+
+``` bash
+ubuntu@hi3798mv100:~/C-Learn$ cd build && make clean && make
+Scanning dependencies of target C_Learn
+[ 25%] Building C object CMakeFiles/C_Learn.dir/main.c.o
+/home/ubuntu/C-Learn/main.c:12:9: note: #pragma message: Found moduleA.h!
+   12 | #pragma message "Found moduleA.h! "
+      |         ^~~~~~~
+/home/ubuntu/C-Learn/main.c:18:2: warning: #warning "Can not found moudleB.h, use balabala instead. " [-Wcpp]
+   18 | #warning "Can not found moudleB.h, use balabala instead. "
+      |  ^~~~~~~
+[ 50%] Building C object CMakeFiles/C_Learn.dir/moduleA/moduleA.c.o
+[ 75%] Building C object CMakeFiles/C_Learn.dir/moduleB/moduleB.c.o
+[100%] Linking C executable C_Learn
+[100%] Built target C_Learn
+```
+
+在代码中，我们如果能找到`moduleA.h`，我们就让编译器提示可以找到，并且将它包含。由于`moduleB.h`并不可以通过尖括号直接访问到，因此我们这里抛出一个警告，提示用户`moduleB.h`无法访问，需要用其他头文件替代，并且编译也不会报错。

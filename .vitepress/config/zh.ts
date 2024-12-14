@@ -68,9 +68,9 @@ function sidebarC(): DefaultTheme.SidebarItem[] {
             ]
         },
         {
-            text: '变量与内存',
+            text: '变量',
+            link: 'VariableRoom.md',
             items: [
-                { text: '变量是容器', link: 'VariableRoom.md' },
                 { text: '变量的初值', link: 'VariableInit.md' },
                 { text: '整形变量', link: 'VariableInt.md' },
             ]
@@ -82,6 +82,13 @@ function sidebarC(): DefaultTheme.SidebarItem[] {
                 { text: '枚举', link: 'ComplexEnum.md' },
                 { text: '结构体', link: 'ComplexStruct.md' },
                 { text: '联合体', link: 'ComplexUnion.md' },
+            ]
+        },
+        {
+            text: '数组与指针',
+            link: 'Pointer.md',
+            items: [
+                { text: '数组', link: 'Array.md' },
             ]
         },
         {
@@ -105,6 +112,8 @@ function sidebarC(): DefaultTheme.SidebarItem[] {
                     ]
                 },
                 { text: 'switch标签范围', link: 'GNUswitchRange.md' },
+                { text: '包装头文件', link: 'GNUWrapperHeaders.md' },
+                { text: '数组', link: 'GNUArray.md' },
             ]
         }
     ]
