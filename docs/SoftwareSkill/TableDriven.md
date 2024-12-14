@@ -21,7 +21,7 @@
 
 假如不用表驱动，就用`if-else, switch-case`，那么代码将会是这样：
 
-```
+``` C
 void key_scan() {
     // scan the key ...
     switch (key) {
@@ -69,7 +69,7 @@ void key_scan() {
 
 虽然用了`switch-case`，看着也不是太复杂，假如有非常多的按键，这里的判断逻辑将会变得非常复杂。可以用数组+函数指针来简化代码：
 
-```
+``` C
 void (*key_callback)(int /* key */)[5] = {shutdown,    switch_mode, switch_mode,
                                           switch_mode, play_music,  stop_music};
 
