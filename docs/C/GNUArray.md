@@ -19,7 +19,7 @@ typedef struct {
 } string_t;
 
 string_t *new_string(int len) {
-    string_t *s = (string_t *)malloc(sizeof(string_t) * (len * sizeof(char)));
+    string_t *s = malloc(sizeof(string_t) + (len * sizeof(char)));
     s->len = len;
     return s;
 }
@@ -40,12 +40,12 @@ int main(void) {
     string_t *str = new_string(12);
     set_string(str, "Hello World");
     print_string(str);
-
     delete_string(str);
 
     str = new_string(9);
     set_string(str, "So cool!");
     print_string(str);
+    delete_string(str);
 
     return 0;
 }
@@ -62,6 +62,8 @@ ubuntu@hi3798mv100:~/C-Learn$
 ```
 
 是不是有点C++的`new`的那味了？当然这不是我们的正题。我们使用了一个叫做`string`的结构体，然后我们用`malloc`动态的调整其中的`str`成员大小，就像一个`String`类一样，可以构造，销毁。
+
+这里注意用`malloc`分配的空间是结构体的大小+缓冲区的大小。 
 
 那你可能会说，这个结构体跟我用下面的结构体有什么区别吗？
 
@@ -93,8 +95,11 @@ void delete_string(string_t *s) {
     free(s->str);
     free(s);
 }
-
 ```
+
+这里用一张简单的图来表示这两者的区别：
+
+![零长数组 VS 指针](zero-length-array.svg)
 
 那么零长数组占用空间真的是0吗？我们用代码来看一下：
 
@@ -196,13 +201,13 @@ Rebuild started at 5:18 PM...
 #include <stdio.h>
 
 int main(void) {
-        int length;
-        puts("input length: ");
-        scanf("%d", &length);
-        int array[length];
+    int length;
+    puts("input length: ");
+    scanf("%d", &length);
+    int array[length];
 
-        printf("length of array: %zu\n", sizeof(array) / sizeof(array[0]));
-        printf("Address of length: %p, array: %p\n", &length, array);
+    printf("length of array: %zu\n", sizeof(array) / sizeof(array[0]));
+    printf("Address of length: %p, array: %p\n", &length, array);
 
     return 0;
 }
@@ -258,3 +263,32 @@ main.c:4:5: error: variably modified ‘array’ at file scope
       |     ^~~~~
 ubuntu@hi3798mv100:~/C-Learn$
 ```
+
+## 数组初始化
+
+GNU允许我们给一定范围的元素给初值：
+
+``` C
+#include <stdio.h>
+
+int array[] = {[0 ... 2] = 1, [4 ... 6] = 2};
+
+int main(void) {
+    printf("length of array: %d\n", sizeof(array) / sizeof(array[0]));
+    for (int i = 0; i < sizeof(array) / sizeof(array[0]); i++) {
+        printf("array[%d] = %d\t", i, array[i]);
+    }
+    printf("\n");
+    return 0;
+}
+
+```
+
+运行结果：
+
+``` bash
+length of array: 7
+array[0] = 1	array[1] = 1	array[2] = 1	array[3] = 0	array[4] = 2	array[5] = 2	array[6] = 2
+```
+
+需要注意，三个点前后必须有空格，否则会导致编译错误。

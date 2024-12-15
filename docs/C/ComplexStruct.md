@@ -397,9 +397,9 @@ offset of member5: 8
 
 ## 位域(bit field)
 
-> [c bit fields | microsoft learn](https://learn.microsoft.com/en-us/cpp/c-language/c-bit-fields?view=msvc-170)
+> [c bit fields | Microsoft Learn](https://learn.microsoft.com/en-us/cpp/c-language/c-bit-fields?view=msvc-170)
 >
-> [c++ struct 位域 | 拾荒志](https://murphypei.github.io/blog/2019/06/struct-bit-field)
+> [C++ struct 位域 | 拾荒志](https://murphypei.github.io/blog/2019/06/struct-bit-field)
 >
 > [【结构体内功修炼】结构体实现位段（二）_c语言_albert edison_infoq写作社区](https://xie.infoq.cn/article/d63013a03e86ece67f3aedbc9)（这个文章有个小歧义，就是位域成员应该是整形类型，不单是`int`和`unsigned int`，要是说扩充`int`到`char short long`也不是不行）
 
