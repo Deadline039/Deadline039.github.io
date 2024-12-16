@@ -153,7 +153,7 @@ int main(void) {
 
 Ubuntu 20.04下GCC 9.4.0编译运行结果：
 
-``` C
+``` bash
 ubuntu@hi3798mv100:~/C-Learn$ gcc main.c -o main
 ubuntu@hi3798mv100:~/C-Learn$ ./main
 input length:
@@ -161,6 +161,24 @@ input length:
 length of array: 10
 ubuntu@hi3798mv100:~/C-Learn$
 ```
+
+Ubuntu 20.04下GCC 9.4.0使用C89/C99标准编译，不使用GNU扩展：
+
+``` bash
+ubuntu@hi3798mv100:~/C-Learn$ gcc -std=c89 --pedantic main.c -o main
+main.c: In function ‘main’:
+main.c:7:5: warning: ISO C90 forbids variable length array ‘array’ [-Wvla]
+    7 |     int array[length];
+      |     ^~~
+main.c:7:5: warning: ISO C90 forbids mixed declarations and code [-Wdeclaration-after-statement]
+main.c:8:12: warning: ISO C90 does not support the ‘z’ gnu_printf length modifier [-Wformat=]
+    8 |     printf("length of array: %zu\n", sizeof(array) / sizeof(array[0]));
+      |            ^~~~~~~~~~~~~~~~~~~~~~~~
+ubuntu@hi3798mv100:~/C-Learn$ gcc -std=c99 --pedantic main.c -o main
+ubuntu@hi3798mv100:~/C-Learn$
+```
+
+我们看到，使用C89编译抛出了三个警告，第一个警告说ISO C90不允许使用变量定义数组长度；第二个警告说ISO C90不允许混合代码与声明，也就是说必须将变量声明放在语句前面；第三个是不支持`%z`这种`printf`格式。而使用C99编译，没有任何警告，这是因为C99已经支持了上面所说的三点。
 
 Windows下Clang 18.1.6编译结果：
 
@@ -240,7 +258,7 @@ ubuntu@hi3798mv100:~/C-Learn$
 
 从上图可以看出，数组是分配在栈上的，而不是使用堆里。因此变长数组可以由编译器来进行分配与释放，相比与`malloc`也会较为安全，不会有内存泄漏的问题。
 
-顺带一提，全局变量不可以用变量来定义长度，哪怕是用`const`修饰的全局变量也不可以：
+顺带一提，全局数组不可以用变量来定义长度，哪怕是用`const`修饰的变量也不可以：
 
 ``` C
 #include <stdio.h>
@@ -264,9 +282,15 @@ main.c:4:5: error: variably modified ‘array’ at file scope
 ubuntu@hi3798mv100:~/C-Learn$
 ```
 
+虽然VLA用起来比`malloc`会更加方便，但是Linus有云：
+
+> AND USING VLA'S IS ACTIVELY STUPID! It generates much more code, and much _slower_ code (and more fragile code), than just using a fixed key size would have done.
+>
+>                   Linus
+
 ## 数组初始化
 
-GNU允许我们给一定范围的元素给初值：
+GNU允许我们给一定范围的成员给初值：
 
 ``` C
 #include <stdio.h>
