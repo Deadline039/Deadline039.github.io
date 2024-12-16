@@ -99,7 +99,7 @@ void delete_string(string_t *s) {
 
 这里用一张简单的图来表示这两者的区别：
 
-![零长数组 VS 指针](zero-length-array.svg)
+![零长数组 VS 指针](/C/zero-length-array.svg)
 
 那么零长数组占用空间真的是0吗？我们用代码来看一下：
 
