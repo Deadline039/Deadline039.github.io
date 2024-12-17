@@ -359,7 +359,7 @@ Address of array: 0xbeb8d4dc
 Address of array[0]: 0xbeb8d4dc
 ```
 
-下标的实际意义就是首地址加上一定的偏移量：
+下标的本质就是首地址加上一定的偏移量：
 
 ``` C
 #include <stdio.h>
@@ -368,9 +368,10 @@ int array[5];
 
 int main(void) {
     array[3] = 10;
-    int *ptr = array + 3;
+    int *ptr = array;
     printf("array[3] = %d\n", array[3]);
-    printf("array + 3: %d\n", *ptr);
+    printf("*(array + 3) =  %d\n", *(array + 3));
+    printf("ptr[3] = %d\n", ptr[3]);
 
     return 0;
 }
@@ -380,10 +381,11 @@ int main(void) {
 
 ``` bash
 array[3] = 10
-array + 3: 10
+*(array + 3) =  10
+ptr[3] = 10
 ```
 
-我们给下标为3的成员给了10，也就是第四个成员。可以看到，用`array[3]`与`array + 3`的结果是一样的。所以，下标实际上就是一种语法糖，它的目的就是为了简化代码，提高代码的可读性。
+我们给下标为3的成员给了10，也就是第四个成员。可以看到，用`array[3]`与`array + 3`的结果是一样的，同时，我将`array`的地址赋给`ptr`，用`ptr[3]`也可以访问到数组第四个成员。所以，下标实际上就是一种语法糖，其本质还是地址偏移，它的目的就是为了简化代码，提高代码的可读性。
 
 声明一个数组，它的大小和位置就固定下来了，也就是说，它是静态的，并不是动态的。就像我们去定制一个柜子一样，做了几个格子，就只能有这么多个格子，如果要增加就只能重新定做。
 
@@ -467,10 +469,10 @@ arr[0] = 1      arr[1] = 2      arr[2] = 3      arr[3] = 4      arr[4] = 5
 ubuntu@hi3798mv100:~/C-Learn$
 ```
 
-`static`修饰的局部变量地址是固定的。不被`static`修饰的变量，每次调用的时候都需要入栈，而调用堆栈是动态变化的，所以局部变量地址是不确定的，即使想办法把这个数组的地址返回也属于野指针。
+`static`修饰的局部变量地址是固定的。不被`static`修饰的局部变量，每次调用的时候都需要入栈，而调用堆栈是动态变化的，所以局部变量地址是不确定的，即使想办法把这个数组的地址返回也属于野指针。
 
 ::: tip
-`static`的意思是静态，为什么是静态呢？我们刚提到过，静态的含义是指它是相对固定的，很难做扩展。`static`还有另一个含义是私有，被`static`修饰的变量只能被这个函数显式调用，虽然可以通过指针给其他函数使用，但是一般需要经过`getter setter`间接访问，相比与直接公开也更加安全。这就是OOP四大特点之一的封装。
+`static`的意思是静态，为什么是静态呢？我们刚提到过，静态的含义是指它是相对固定的，很难做扩展。`static`还有另一个含义是私有，被`static`修饰的局部变量只能被这个函数直接访问，虽然可以通过指针给其他函数访问，但是一般需要经过`getter setter`间接访问，相比与直接公开也更加安全。这就是OOP四大特点之一的封装。
 :::
 
 那假如说我就想返回一个数组怎么办？那就需要用到后面所说的动态内存分配了。
@@ -491,7 +493,7 @@ void print_array(int *arr, int size) {
     putchar('\n');
 }
 
-void invert_print_array(int arr[], int size) {
+void reverse_print_array(int arr[], int size) {
     for (int i = size - 1; i >= 0; --i) {
         printf("arr[%d] = %d\t", i, arr[i]);
     }
@@ -501,7 +503,7 @@ void invert_print_array(int arr[], int size) {
 int main(void) {
     int arr[5] = {1, 2, 3, 4, 5};
     print_array(arr, ARRAY_LENGTH(arr));
-    invert_print_array(arr, ARRAY_LENGTH(arr));
+    reverse_print_array(arr, ARRAY_LENGTH(arr));
 
     return 0;
 }
@@ -514,7 +516,7 @@ arr[0] = 1      arr[1] = 2      arr[2] = 3      arr[3] = 4      arr[4] = 5
 arr[4] = 5      arr[3] = 4      arr[2] = 3      arr[1] = 2      arr[0] = 1
 ```
 
-前面讲了，下表访问实际上就是指针偏移，所以我们把数组名也就是首地址传入就可以了，剩下的成员可以通过数组首地址来访问。
+前面说了，下标访问实际上就是指针偏移，所以我们把数组名也就是首地址传入就可以了，剩下的成员可以通过数组首地址来访问。
 
 这里函数参数使用`int *arr`或者`int arr[]`是一样的，传入函数都会变成指针，就算在方括号里填入数字（`int arr[5]`）也是指针，所以我在参数处要求填入数组长度。这种数组变成指针的情况就是下面要将的数组退化指针。
 
@@ -522,7 +524,7 @@ arr[4] = 5      arr[3] = 4      arr[2] = 3      arr[1] = 2      arr[0] = 1
 
 > [从C语言的数组参数退化为指针谈起 | Cugtyt](https://cugtyt.github.io/blog/2018/02211209.html)
 
-数组和指针虽然都可以用下标的方式使用，看起来好像没有什么区别，其实是有一点区别的，我们来看下面的代码：
+数组和指针虽然都可以用下标的方式访问成员，看起来好像没有什么区别，其实是有一点区别的，我们来看下面的代码：
 
 ``` C
 #include <stdio.h>
@@ -576,7 +578,7 @@ int main(void) {
 }
 ```
 
-编译&运行结果：
+MINGW64编译&运行结果：
 
 ``` bash
 Deadline039@LAPTOP-83FQRJF MINGW64 /e/C-Learn
@@ -606,4 +608,101 @@ Deadline039@LAPTOP-83FQRJF MINGW64 /e/C-Learn
 $
 ```
 
-可以看到，编译的时候已经给我们警告了，提示我们我们用`sizeof`获取`arr`的容量将会返回`int *`的大小，运行获取的长度都是8，也就是`int *`的大小。原因上面已经说过了，将数组传递给函数参数，就相当于是把数组的首地址赋值给指针变量，会丢失长度信息。因此我们用`sizeof`获取的长度都是`int *`的大小。所以在参数中写`int arr[]`与`int arr[5]`没有区别，都是指针不会有指针信息，参数中填入的长度会被忽略。
+可以看到，编译的时候已经给我们警告了，提示我们我们用`sizeof`获取`arr`的容量将会返回`int *`的大小，运行获取的长度都是8（64位平台的指针大小是8字节），也就是`int *`的大小。原因上面已经说过了，将数组传递给函数参数，就相当于是把数组的首地址赋值给指针变量，会丢失长度信息。因此我们用`sizeof`获取的长度都是`int *`的大小。所以在参数中写`int arr[]`与`int arr[5]`没有区别，都是指针不会有长度信息，参数中填入的长度会被忽略。所以在使用`sizeof`获取数组长度的时候一定要注意这一点，到底是指针还是数组。
+
+有人可能会想，我把数组当作一个指针变量，然后像操作指针一样操作数组可不可以？
+
+``` C
+int main(void) {
+    int arr1[3] = {1, 2, 3};
+    int arr2[3] = {4, 5, 6};
+    arr1 = arr2;
+    arr1 = &arr1[2];
+
+    return 0;
+}
+```
+
+编译结果：
+
+``` bash
+ubuntu@hi3798mv100:~/C-Learn$ gcc main.c -o main
+main.c: In function ‘main’:
+main.c:4:10: error: assignment to expression with array type
+    4 |     arr1 = arr2;
+      |          ^
+main.c:5:10: error: assignment to expression with array type
+    5 |     arr1 = &arr1[2];
+      |          ^
+ubuntu@hi3798mv100:~/C-Learn$
+```
+
+显然，数组不能作为普通的指针变量一样赋值，虽然它和指针有相似的地方，但是不能把它完全当作指针使用。
+
+### 数组安全性
+
+数组作为参数传递时候，还有一个要关注的问题是安全性。
+
+``` C
+#include <stdio.h>
+
+void print_array(int arr[], int size) {
+    for (int i = 0; i < size; ++i) {
+        printf("array[%d] = %d\t", i, arr[i]);
+    }
+
+    putchar('\n');
+
+    arr[0] = 100;
+}
+
+int main(void) {
+    int array[5] = {1, 2, 3, 4, 5};
+    print_array(array, sizeof(array) / sizeof(array[0]));
+
+    if (array[0] != 1) {
+        printf("WTF?!\n");
+    } else {
+        printf("OK\n");
+    }
+
+    return 0;
+}
+```
+
+运行结果：
+
+``` bash
+array[0] = 1    array[1] = 2    array[2] = 3    array[3] = 4    array[4] = 5
+WTF?!
+```
+
+在`print_array`函数里会把`array`的第一个成员的值设为100，但是`main`函数如果不校验，就不知道会有这种变化。
+
+那么为什么在`print_array`里对数组操作会影响到`main`函数里的数组呢？这是因为我们传入的数组，就相当于传入了`main`函数中`array`所在的内存区域，我们在`print_array`里对`arr`操作，其实就是对`main`里的`array`操作，所以为了保险起见，会把只读数组的参数加`const`修饰，这样写入的时候会直接编译报错：
+
+``` C
+#include <stdio.h>
+
+void print_array(const int arr[], const int size) {
+    for (int i = 0; i < size; ++i) {
+        printf("array[%d] = %d\t", i, arr[i]);
+    }
+
+    putchar('\n');
+
+    arr[0] = 100;
+}
+```
+
+编译结果：
+
+``` bash
+ubuntu@hi3798mv100:~/C-Learn$ gcc main.c -o main
+main.c: In function ‘print_array’:
+main.c:10:12: error: assignment of read-only location ‘*arr’
+   10 |     arr[0] = 100;
+      |            ^
+```
+
+关于`const`，我们以后会详细讲解它。

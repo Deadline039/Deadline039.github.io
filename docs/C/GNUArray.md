@@ -108,9 +108,15 @@ void delete_string(string_t *s) {
 
 int array[0];
 
+typedef struct {
+    int len;
+    char str[0];
+} string_t;
+
 int main(void) {
     printf("size of array: %zu\n", sizeof(array));
     printf("length of array: %zu\n", sizeof(array) / sizeof(array[0]));
+    printf("size of string_t: %zu\n", sizeof(string_t));
     return 0;
 }
 ```
@@ -121,6 +127,7 @@ int main(void) {
 ubuntu@hi3798mv100:~/C-Learn$ gcc main.c -o main && ./main
 size of array: 0
 length of array: 0
+size of string_t: 4
 ubuntu@hi3798mv100:~/C-Learn$
 ```
 
