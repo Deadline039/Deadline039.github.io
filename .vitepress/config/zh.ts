@@ -89,6 +89,7 @@ function sidebarC(): DefaultTheme.SidebarItem[] {
             link: 'Pointer.md',
             items: [
                 { text: '数组', link: 'Array.md' },
+                { text: '指针', link: 'PtrBasic.md' },
             ]
         },
         {

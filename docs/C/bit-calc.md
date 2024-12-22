@@ -33,7 +33,7 @@ uint32_t status_reg = 0;
 #define BASY (1U << 14)
 
 int main(void) {
-    /* ... 写入数据到发送区 */
+    /* 写入数据到发送区 ... */
 
     /* 是否被占用置1 */
     status_reg |= BASY;
@@ -197,22 +197,22 @@ int main(void) {
 
     int result;
 
-    puts("Start 1 to 10000000 * 15\n");
+    puts("Start 1 to 10000000 * 15");
 
     gettimeofday(&tv1, NULL);
     for (int i = 0; i < 10000000; ++i) {
-        result = i / 15;
+        result = i * 15;
         (void)result;
     }
 
     gettimeofday(&tv2, NULL);
     printf("Usage: %lld us.\n", tv2.tv_usec - tv1.tv_usec);
 
-    puts("Start 1 to 10000000 * 16\n");
+    puts("Start 1 to 10000000 * 16");
 
     gettimeofday(&tv1, NULL);
     for (int i = 0; i < 10000000; ++i) {
-        result = i / 16;
+        result = i * 16;
         (void)result;
     }
 
@@ -227,14 +227,14 @@ int main(void) {
 运行结果
 
 ``` bash
-Start 1 to 10000000 * 15
+Start 1 to 10000000 / 15
 Usage: 10913 us.
 
-Start 1 to 10000000 * 16
+Start 1 to 10000000 / 16
 Usage: 7220 us.
 ```
 
-可以看到，从1 ~ 10000000取余数的话，15取余相比与16乘法多了点。我们来看看上面的代码反汇编的内容：
+可以看到，从1 ~ 10000000做除法的话，15相比16时间会多一点。我们来看看上面的代码反汇编的内容：
 
 ``` bash
 Deadline039@LAPTOP-CUCD2Q7 MINGW64 /e/C-Learn
@@ -273,4 +273,4 @@ main.exe:    file format pei-x86-64
     }
 ```
 
-乘15需要5步操作，乘16只需要3步操作，编译器自动将乘16的运算优化了左移4位。
+乘15需要5步操作，乘16只需要3步操作，乘16的运算在汇编中就是左移4位。

@@ -15,3 +15,14 @@
 
 没有顺序，想到什么写什么。
 
+出现的编译环境：
+
+- Windows 10 22H2 x86-64: MinGW-W64 gcc 8.1.0
+
+- Windows 10 22H2 x86-64: Clang 18.1.6
+
+- Windows 10 22H2 x86-64: MSVC(v143) VS2022 C++ x64/x86
+
+- Ubuntu 20.04 armv7l aarch32 (hi3798mv100): gcc version 9.4.0 (Ubuntu 9.4.0-1ubuntu1~20.04.2)
+
+除去非标准C的部分，大部分情况下这些编译环境的结果没有太大的差别，如果有差别我会指出。
