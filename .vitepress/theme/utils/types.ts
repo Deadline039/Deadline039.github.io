@@ -1,4 +1,4 @@
-/* types.ts */
+/* type.ts */
 export interface NavLink {
   /** 站点图标 */
   icon?: string | { svg: string }

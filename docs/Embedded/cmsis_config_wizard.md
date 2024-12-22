@@ -1,6 +1,9 @@
 ---
-layout: home
+layout: doc
+layoutClass: m-nav-layout
+sidebar: false
 ---
+
 
 # CMSIS配置向导标记
 

@@ -28,6 +28,7 @@ export const zh = defineConfig({
         },
 
         outline: {
+            level: 'deep',
             label: '页面导航'
         },
 

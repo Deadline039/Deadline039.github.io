@@ -23,3 +23,14 @@ hero:
 
 ---
 
+感谢一下作者提供的搭建教程与指南：
+
+- [VitePress | 快速上手中文教程](https://vitepress.yiov.top/)
+
+- [茂茂物语](https://fe-nav.netlify.app/)
+
+- [LiteLoaderQQNT](https://liteloaderqqnt.github.io/)
+
+- [Nólëbase | 记录回忆，知识和畅想的地方](https://nolebase.ayaka.io/)
+
+转载请注明出处。

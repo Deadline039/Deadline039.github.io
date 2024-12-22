@@ -13,12 +13,16 @@
 
 那这有什么用呢？假如我现在写的程序中需要一个`void data_printf(data_t *data)`的一个输出数据函数，客户说他们可能需要自己定义输出格式。这有个问题，我不知道客户会不会写他们的输出函数，我必须有一个默认的输出函数来保证程序可以正常编译不报错。这个问题的解决方法有很多，比如用函数指针等。如果用弱定义，那就非常简单了，我在我的文件中用弱函数定义一个输出函数。客户如果要重定义，直接自己写就可以了，重定义的函数会覆盖掉弱函数，这样即避免了编译问题，又可以让客户自定义：
 
-``` C
+::: code-group
+
+``` C [MySrc.c]
 /* My source file: */
 __attribute__((weak)) void data_printf(data_t *data) {
     /* ... */
 }
+```
 
+``` C [CustomSrc.c]
 /* Custom source file: */
 extern void data_printf(data_t *data);
 
@@ -26,8 +30,9 @@ extern void data_printf(data_t *data);
 void data_printf(data_t *data) {
     /* Custom format ... */
 }
-
 ```
+
+:::
 
 需要注意，弱函数和重定义函数需要在不同文件中，在同一个文件中如果同时存在弱函数和同名的重定义函数会报错。从这里可以看出，弱函数是在链接时被移除的。
 

@@ -1,6 +1,7 @@
 import { defineConfig } from 'vitepress'
 import { search as zhSearch } from './zh'
 import PanguPlugin from 'markdown-it-pangu'
+import implicitFigures from 'markdown-it-implicit-figures'
 
 export const shared = defineConfig({
 
@@ -32,6 +33,10 @@ export const shared = defineConfig({
                 return htmlResult;
             };
             md.use(PanguPlugin);
+            md.use(implicitFigures, {
+                figcaption: true,
+                copyAttrs: '^class$'
+            });
         },
 
         codeTransformers: [

@@ -1,0 +1,12 @@
+/* .vitepress/theme/style/var.css */
+figcaption {
+    color: rgb(173, 173, 173);
+    font-size: 14px;
+    text-align: center;
+}
+
+img {
+    padding: inherit;
+    margin: auto;
+    display: block;
+}
