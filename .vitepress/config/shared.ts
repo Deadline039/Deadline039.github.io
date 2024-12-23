@@ -23,6 +23,10 @@ export const shared = defineConfig({
         ],
     },
 
+    head: [
+        ['link', { rel: 'icon', href: '/logo.ico' }],
+    ],
+
     markdown: {
         math: true,
         lineNumbers: true,

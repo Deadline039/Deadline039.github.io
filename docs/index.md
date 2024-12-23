@@ -4,6 +4,8 @@ layout: home
 
 hero:
   text: "Hi there, 欢迎访问我的知识库"
+  image:
+    src: /logo.webp
   actions:
     - theme: brand
       text: C语言
