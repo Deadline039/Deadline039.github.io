@@ -35,4 +35,6 @@ hero:
 
 - [Nólëbase | 记录回忆，知识和畅想的地方](https://nolebase.ayaka.io/)
 
+头像：[紺屋鴉江 93976900](https://www.pixiv.net/en/artworks/93976900)
+
 转载请注明出处。
