@@ -2,7 +2,7 @@
 
 ## 位运算与逻辑运算
 
-位运算有与或非，逻辑也有与或非。位运算是按二进制位操作的，比如`10 & 5 = 0b0110 & 0b0010 = 2`。逻辑运算是指的逻辑条件，0是假，非0为真，例如`10 && 2 = 1`。
+位运算有与或非，逻辑也有与或非。位运算是按二进制位操作的，比如`6 & 2 = 0b0110 & 0b0010 = 2`。逻辑运算是指的逻辑条件，0是假，非0为真，例如`10 && 2 = 1`。
 
 ## 位运算与写入
 
@@ -39,11 +39,11 @@ int main(void) {
     status_reg |= BASY;
 
     /* 等待直至发送完成为空 */
-    while (status &TXNE)
+    while (status_reg & TXNE)
         ;
 
     /* 是否被占用置0 */
-    status &= ~(BASY);
+    status_reg &= ~(BASY);
 }
 ```
 
@@ -52,6 +52,62 @@ int main(void) {
 从x位到y位一般表示成`bit[y:x]`，y在x前面是因为低位在后面。而我们说从x到y一般是从低位到高位。而说从x到y个字节可以表示成`byte[x:y]`。
 
 其实借助结构体位域也可以实现位操作，参照：[位域](/C/ComplexStruct#%E4%BD%8D%E5%9F%9F-bit-field)。但是位域不具有可移植性。如果你的代码在不同平台与不同编译器下编译，那么位域的大小和地址不一定是固定的。
+
+## `iso646.h`
+
+这里提一个较为冷门的头文件，可以看一下这个头文件的内容：
+
+``` C
+/* Copyright (C) 1997-2023 Free Software Foundation, Inc.
+This file is part of GCC.
+省略部分注释。。。
+*/
+
+/*
+ * ISO C Standard:  7.9  Alternative spellings  <iso646.h>
+ */
+
+#ifndef _ISO646_H
+#define _ISO646_H
+
+#ifndef __cplusplus
+#define and	    &&
+#define and_eq	&=
+#define bitand	&
+#define bitor	|
+#define compl	~
+#define not	    !
+#define not_eq	!=
+#define or	    ||
+#define or_eq	|=
+#define xor	    ^
+#define xor_eq	^=
+#endif
+
+#endif
+```
+
+这个头文件的内容非常简单，就是将一些位运算和逻辑运算用宏定义表示，那么上面的代码我们就可以这样写：
+
+``` C
+#include <iso646.h>
+
+int main(void) {
+    /* 写入数据到发送区 ... */
+
+    /* 是否被占用置1 */
+    status_reg or_eq BASY;
+
+    /* 等待直至发送完成为空 */
+    while (status_reg bitand TXNE)
+        ;
+
+    /* 是否被占用置0 */
+    status_reg and_eq compl(BASY);
+}
+```
+
+用了这个头文件，一些逻辑判断我们也可以写成：`if (A and B or not C)`，是不是有Python那味了？
 
 ## 取余与位运算
 
