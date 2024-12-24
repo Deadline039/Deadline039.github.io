@@ -130,6 +130,7 @@ int array[2][3];
 char *stu[6][5];
 
 void init(void) {
+    /* 这里为了方便演示, 直接指向字符串常量, 实际程序中不要这样做 */
     stu[1][2] = "张亮";
     stu[0][2] = "周明";
     stu[1][0] = "李小冬";
@@ -193,6 +194,10 @@ int main(void) {
 ```
 
 由于数组下标是从0开始的，所以我们访问数组成员的时候需要把下标减1。`stu`是一个二维数组，`stu[i]`就是一个一维数组，`stu[i][j]`就是实际的一个数组成员，就像平面直角坐标系一样，三维数组就像一个空间直角坐标系。
+
+::: warning
+这里为了方便演示二维数组，数组成员直接指向的是字符串常量的地址，在实际程序中肯定不能这样做，需要对每个成员分配空间来存储字符串，否则修改数组的成员将会发送错误。
+:::
 
 ## 数组的初始化
 
@@ -335,12 +340,12 @@ Array length: 10
 `int`在32位机上占用是4字节，所以每个成员的大小是4字节，数组的长度为10，所以总共占用4 * 10 = 40字节。
 
 ::: tip
-我们说大小，一般是指的它占用的内存大小，比如`int arrray[10]`我们说它大小是40字节；而长度指的是数组总共能存储多少个成员，比如上面的`array`我们说它的长度是10。
+我们说大小，一般是指的它占用的内存大小，比如`int array[10]`我们说它大小是40字节；而长度指的是数组总共能存储多少个成员，比如上面的`array`我们说它的长度是10。
 
 相信你也看到了，我们获取数组长度的方式就是用数组的大小除以数组成员的大小，也就是`sizeof(array) / sizeof(array[0])`。
 :::
 
-数组名就是数组成员的首地址，这是什么意思呢？上面提到了，数组其实就是一片连续的内存。那么我们访问数组的成员，就相当于访问某一块内存区域。而数组名字就相当于是一个头，它表示第一个成员的位置，我们从这里出发就可以访问我们想要的内存区域。
+数组名就是数组成员的首地址，这是什么意思呢？上面提到了，数组其实就是一片连续的内存。那么我们访问数组的成员，就相当于访问某一块内存区域。而数组名字就相当于是一个头，它表示第一个成员的位置，找到头了以后，想要访问其他成员就很简单了。
 
 ``` C
 #include <stdio.h>
@@ -580,37 +585,116 @@ int main(void) {
 }
 ```
 
-MINGW64编译&运行结果：
+GCC 9.4.0 32位机编译，运行结果：
 
 ``` bash
-Deadline039@LAPTOP-83FQRJF MINGW64 /e/C-Learn
-$ gcc main.c -o main.exe
-main.c: In function 'arr_func2':
-main.c:8:47: warning: 'sizeof' on array function parameter 'arr' will return size of 'int *' [-Wsizeof-array-argument]
-     printf("size of int arr[] = %zu\n", sizeof(arr));
-                                               ^
+ubuntu@hi3798mv100:~/C-Learn$ vim main.c
+ubuntu@hi3798mv100:~/C-Learn$ gcc main.c -o main
+main.c: In function ‘arr_func2’:
+main.c:8:47: warning: ‘sizeof’ on array function parameter ‘arr’ will return size of ‘int *’ [-Wsizeof-array-argument]
+    8 |     printf("size of int arr[] = %zu\n", sizeof(arr));
+      |                                               ^
 main.c:7:19: note: declared here
- int arr_func2(int arr[]) {
-               ~~~~^~~~~
-main.c: In function 'arr_func3':
-main.c:12:48: warning: 'sizeof' on array function parameter 'arr' will return size of 'int *' [-Wsizeof-array-argument]
-     printf("size of int arr[5] = %zu\n", sizeof(arr));
-                                                ^
+    7 | int arr_func2(int arr[]) {
+      |               ~~~~^~~~~
+main.c: In function ‘arr_func3’:
+main.c:12:48: warning: ‘sizeof’ on array function parameter ‘arr’ will return size of ‘int *’ [-Wsizeof-array-argument]
+   12 |     printf("size of int arr[5] = %zu\n", sizeof(arr));
+      |                                                ^
 main.c:11:19: note: declared here
- int arr_func3(int arr[5]) {
-               ~~~~^~~~~~
-
-Deadline039@LAPTOP-83FQRJF MINGW64 /e/C-Learn
-$ ./main.exe
-size of int *arr = 8
-size of int arr[] = 8
-size of int arr[5] = 8
-
-Deadline039@LAPTOP-83FQRJF MINGW64 /e/C-Learn
-$
+   11 | int arr_func3(int arr[5]) {
+      |               ~~~~^~~~~~
+ubuntu@hi3798mv100:~/C-Learn$ ./main
+size of int *arr = 4
+size of int arr[] = 4
+size of int arr[5] = 4
+ubuntu@hi3798mv100:~/C-Learn$
 ```
 
-可以看到，编译的时候已经给我们警告了，提示我们我们用`sizeof`获取`arr`的容量将会返回`int *`的大小，运行获取的长度都是8（64位平台的指针大小是8字节），也就是`int *`的大小。原因上面已经说过了，将数组传递给函数参数，就相当于是把数组的首地址赋值给指针变量，会丢失长度信息。因此我们用`sizeof`获取的长度都是`int *`的大小。所以在参数中写`int arr[]`与`int arr[5]`没有区别，都是指针不会有长度信息，参数中填入的长度会被忽略。所以在使用`sizeof`获取数组长度的时候一定要注意这一点，到底是指针还是数组。
+可以看到，编译的时候已经给我们警告了，提示我们我们用`sizeof`获取`arr`的容量将会返回`int *`的大小，运行获取的长度都是4（32位平台的指针大小是4字节），也就是`int *`的大小。原因上面已经说过了，将数组传递给函数参数，就相当于是把数组的首地址赋值给指针变量，会丢失长度信息。因此我们用`sizeof`获取的长度都是`int *`的大小。所以在参数中写`int arr[]`与`int arr[5]`没有区别，都是指针不会有长度信息，参数中填入的长度会被忽略。所以在使用`sizeof`获取数组长度的时候一定要注意这一点，到底是指针还是数组。
+
+还有种写法是这样：
+
+``` C
+#include <stdio.h>
+
+void arr_func(int (*arr)[5]) {
+    printf("size of arr: %zu, size of arr[0]: %zu\n", sizeof(arr), sizeof(arr[0]));
+    for (int i = 0; i < sizeof(arr[0]) / sizeof(arr[0][0]); ++i) {
+        printf("arr[0][%d] = %d\t", i, arr[0][i]);
+    }
+    putchar('\n');
+}
+
+int main(void) {
+    int arr1[5] = {1, 2, 3, 4, 5};
+    int arr2[6] = {2, 3, 4, 5, 6, 7};
+    arr_func(&arr1);
+    arr_func(&arr2);
+
+    return 0;
+}
+```
+
+GCC 9.4.0 32位机编译，运行结果：
+
+``` bash
+ubuntu@hi3798mv100:~/C-Learn$ gcc main.c -o main
+main.c: In function ‘main’:
+main.c:15:14: warning: passing argument 1 of ‘arr_func’ from incompatible pointer type [-Wincompatible-pointer-types]
+   15 |     arr_func(&arr2);
+      |              ^~~~~
+      |              |
+      |              int (*)[6]
+main.c:3:21: note: expected ‘int (*)[5]’ but argument is of type ‘int (*)[6]’
+    3 | void arr_func(int (*arr)[5]) {
+      |               ~~~~~~^~~~~~~
+ubuntu@hi3798mv100:~/C-Learn$ ./main
+size of arr: 4, size of arr[0]: 20
+arr[0][0] = 1   arr[0][1] = 2   arr[0][2] = 3   arr[0][3] = 4   arr[0][4] = 5
+size of arr: 4, size of arr[0]: 20
+arr[0][0] = 2   arr[0][1] = 3   arr[0][2] = 4   arr[0][3] = 5   arr[0][4] = 6
+ubuntu@hi3798mv100:~/C-Learn$
+```
+
+`arr_func`的参数是一个长度为5的数组指针，意思是这是一个`int*`的指针，指向一个长度为5的`int`数组。所以，在调用函数传参的时候，需要对数组取地址，也就是`&arr`，这样才可以与`arr_func`的参数匹配。不加取地址也是可以的，不过编译会有警告。
+
+那么为什么要这样传参呢？上面提到，`arr`是一个数组指针，**它指向一个长度为5的`int`数组**，在函数中，`arr`的大小为4，确实是一个指针；**但是`arr[0]`的大小为`20`，也就是说，它是一个数组**。但是，这个数组的长度**固定为5**，我们再次调用`arr_func`并传入`arr2`的时候编译抛出警告，参数类型不匹配；并且只输出了前5个元素的值，并没有输出第6个元素的值。
+
+这里也引出来一个问题。我们知道，数组名就是第一个元素的首地址，某种程度上也算是一种指针。那么我们对数组名取地址会发生什么？
+
+``` C
+#include <stdio.h>
+
+int main(void) {
+    int arr[5] = {1, 2, 3, 4, 5};
+    int (*ptr)[5];
+
+    ptr = arr;
+    printf("Address of arr: %p, size of arr: %zu\n", arr, sizeof(arr));
+
+    ptr = &arr;
+    printf("Address of &arr: %p, size of &arr: %zu\n", &arr, sizeof(&arr));
+
+    return 0;
+}
+```
+
+GCC 9.4.0 32位机编译，运行结果：
+
+``` bash
+ubuntu@hi3798mv100:~/C-Learn$ gcc main.c -o main
+main.c: In function ‘main’:
+main.c:7:9: warning: assignment to ‘int (*)[5]’ from incompatible pointer type ‘int *’ [-Wincompatible-pointer-types]
+    7 |     ptr = arr;
+      |         ^
+ubuntu@hi3798mv100:~/C-Learn$ ./main
+Address of arr: 0xbeca24e8, size of arr: 20
+Address of &arr: 0xbeca24e8, size of &arr: 4
+ubuntu@hi3798mv100:~/C-Learn$
+```
+
+可以看到，`arr`与`&arr`的地址是一样的，但是大小却不一样。`&arr`的大小为4，说明它是一个指针，那类型是什么呢？通过上面的编译信息，我们可以推断出`&arr`的类型是`int (*)[5]`；而`arr`的类型是`int *`。这两者虽然值一样，但是类型是有区别的。
 
 有人可能会想，我把数组当作一个指针变量，然后像操作指针一样操作数组可不可以？
 
