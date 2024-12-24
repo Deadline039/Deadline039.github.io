@@ -110,9 +110,11 @@ ubuntu@hi3798mv100:~/C-Learn$ tree
 3 directories, 6 files
 ```
 
-`CMakeList.txt`：
+每个文件的内容：
 
-```
+::: code-group
+
+``` [CMakeList.txt]
 cmake_minimum_required(VERSION 3.0)
 project(C_Learn C)
 
@@ -129,11 +131,7 @@ add_executable(C_Learn
 )
 ```
 
-大概解释一下这个文件的意思，`include_directories`是指定编译器的`-I`参数，也就是上面所说的编译器设置的头文件查找路径，注意这里**我们只添加了`moduleA`文件夹，而`moduleB`文件没有添加进去。** `add_executable`指的是要编译的文件，以相对路径的形式添加，当然也可以用绝对路径，但是我并不推荐你这样做。
-
-`moduleA.c`文件：
-
-``` C
+``` C [moduleA/moduleA.c]
 /**
  * @file    moduleA.c
  * @author  Deadline039
@@ -151,9 +149,25 @@ void moduleA(void) {
 
 ```
 
-`moduleB.c`文件：
+``` C [moduleA/moduleA.h]
+/**
+ * @file    moduleA.h
+ * @author  Deadline039
+ * @brief   Module A header file.
+ * @version 1.0
+ * @date    2024-12-13
+ */
 
-``` C
+#ifndef __MODULEA_H
+#define __MODULEA_H
+
+void moduleA(void);
+
+#endif /* __MODULEA_H */
+
+```
+
+``` C [moduleB/moduleB.c]
 /**
  * @file    moduleB.c
  * @author  Deadline039
@@ -169,6 +183,35 @@ void moduleB(void) {
     printf("moduleB\n");
 }
 ```
+
+``` C [moduleB/moduleB.h]
+/**
+ * @file    moduleB.h
+ * @author  Deadline039
+ * @brief   Module B header file.
+ * @version 1.0
+ * @date    2024-12-13
+ */
+
+#ifndef __MODULEB_H
+#define __MODULEB_H
+
+void moduleB(void);
+
+#endif /* __MODULEB_H */
+
+```
+
+``` C [main.c]
+int main(void) {
+
+    return 0;
+}
+```
+
+:::
+
+大概解释一下`CMakeList.txt`的意思，`include_directories`是指定编译器的`-I`参数，也就是上面所说的编译器设置的头文件查找路径，注意这里**我们只添加了`moduleA`文件夹，而`moduleB`文件没有添加进去。** `add_executable`指的是要编译的文件，以相对路径的形式添加，当然也可以用绝对路径，但是我并不推荐你这样做。
 
 `main.c`就一个`main`函数，而且只有一个`return 0`，这里我们主要看编译结果。
 
