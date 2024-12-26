@@ -21,6 +21,9 @@ export const shared = defineConfig({
         socialLinks: [
             { icon: 'github', link: 'https://github.com/Deadline039/' }
         ],
+        footer: {
+            message: 'Powered by VitePress, deployed by Github & Vercel. ',
+        }
     },
 
     head: [
