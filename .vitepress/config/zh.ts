@@ -91,6 +91,8 @@ function sidebarC(): DefaultTheme.SidebarItem[] {
             items: [
                 { text: '数组', link: 'Array.md' },
                 { text: '指针', link: 'PtrBasic.md' },
+                { text: '内存管理', link: 'PtrMemory.md' },
+                { text: '空指针与野指针', link: 'PtrNULL.md' },
             ]
         },
         {

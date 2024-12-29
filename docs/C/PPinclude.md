@@ -18,7 +18,7 @@ int main(void) {
 }
 ```
 
-MinGW64编译结果：
+MinGW-w64编译结果：
 
 ``` bash
 E:/C-Learn/main.c: In function 'main':
