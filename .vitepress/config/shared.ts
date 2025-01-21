@@ -12,8 +12,6 @@ export const shared = defineConfig({
     lastUpdated: true,
     cleanUrls: true,
     metaChunk: true,
-
-
     themeConfig: {
         search: {
             provider: 'local'
@@ -27,6 +25,7 @@ export const shared = defineConfig({
     },
 
     head: [
+        ["script", { src: "/_vercel/insights/script.js", defer: true }],
         ['link', { rel: 'icon', href: '/logo.ico' }],
     ],
 
