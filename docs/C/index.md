@@ -25,4 +25,6 @@
 
 - Ubuntu 20.04 armv7l aarch32 (hi3798mv100): gcc version 9.4.0 (Ubuntu 9.4.0-1ubuntu1~20.04.2)
 
+- macOS Sequoia 15.4 arm64-apple-darwin24.4.0 Apple M4: Clang Apple clang version 17.0.0 (clang-1700.0.13.3)
+
 除去非标准C的部分，大部分情况下这些编译环境的结果没有太大的差别，如果有差别我会指出。
