@@ -1,8 +1,8 @@
 # armlink与分散加载文件
 
-> [ARM Compiler armlink User Guide Version 5.06 - Scatter-loading Features](https://developer.arm.com/documentation/dui0474/f/using-scatter-files)
+> [Scatter-loading Features - ARM Compiler armlink User Guide Version 5.06](https://developer.arm.com/documentation/dui0474/f/using-scatter-files)
 >
-> [ARM Compiler armlink User Guide Version 5.06 - Scatter File Syntax](https://developer.arm.com/documentation/dui0474/m/scatter-file-syntax?lang=en)
+> [Scatter File Syntax - ARM Compiler armlink User Guide Version 5.06](https://developer.arm.com/documentation/dui0474/m/scatter-file-syntax?lang=en)
 >
 > [Keil MDK（ARM编译器）分散加载特性（下）：使用分散加载文件（.sct）控制 – 哈冬猪的小站 – 个人学习记录](https://hadongzhu.com/archives/260)
 
@@ -40,7 +40,7 @@ LR_IROM1 0x08000000 0x00040000 {
 
 但是，如果遇到一些复杂内存布局的MCU，或者需要用到外部ROM/RAM的程序，需要管理多块内存的时候，仅仅使用此GUI就显得捉襟见肘了。什么时候建议使用分散加载文件呢？下面是ARM官方的建议：
 
-> [ARM Compiler armlink User Guide Version 5.06 - When to use scatter-loading](https://developer.arm.com/documentation/dui0474/m/scatter-loading-features/the-scatter-loading-mechanism/when-to-use-scatter-loading?lang=en)
+> [When to use scatter-loading - ARM Compiler armlink User Guide Version 5.06](https://developer.arm.com/documentation/dui0474/m/scatter-loading-features/the-scatter-loading-mechanism/when-to-use-scatter-loading?lang=en)
 
 - 复杂的存储布局：代码和数据必须明确指定存储区域
 - 多种存储类型：例如一个系统包含多种存储设备，如内部Flash、内部SRAM、高速SRAM、外部SDRAM、外部ROM等。这时候就需要sct文件去描述这些存储区域
@@ -68,7 +68,7 @@ LR_IROM1 0x08000000 0x00040000 {
 
 在C程序中，程序段可以分为 .bbs, .text段等（[内存布局](/C/PtrMemory#内存布局)），在armlink中定义的数据类型以及他们对应的程序段如下：
 
-- Code: 代码数据，对应 .text，也就是代码段，通常存储在ROM中
+- XO (Execute Only): 只执行数据，就是Code，对应 .text，即代码段，通常存储在ROM中
 - RO (Read Only) Data: 只读数据，对应 .rodata段，通常存储在ROM中，const修饰的静态变量
 - RW (Read and Write) Data: 可读写数据，对应 .data段，存储在RAM中，*赋初始值的*静态变量
 - ZI (Zero Initialized) Data: 初始零数据，对应 .bss段，存储在RAM中，静态变量区，与RW的区别在于ZI没有赋初始值，默认为0
@@ -138,6 +138,92 @@ To use a specific compressor pass the number of the compressor.
 armlink会根据镜像代码自动选择解压器的代码类型。如果镜像只包含ARM code，解压器会使用ARM code；如果镜像包含Thumb code，解压器会使用Thumb code。
 
 ## 分散加载文件语法
+
+::: warning
+以下代码仅在Arm Compiler for Embedded 6.24测试通过，测试平台为 macOS Sequoia 15.5 (Apple M4)，未在其他版本的编译器、AC5下测试，可能有不兼容的语法。
+:::
+
+在搞清楚什么是加载域、运行域以及RO、ZI、RW这些名词的概念后，我们来看看分散加载文件的语法。以上面自动生成的STM32F103RC的分散加载文件为例，来分析一下分散加载文件的语法，以及如何编写分散加载文件。
+
+```
+LR_IROM1 0x08000000 0x00040000 {		; 加载域 LR_IROM1, 起始地址 0x08000000, 大小 0x0004000
+	ER_IROM1 0x08000000 0x00040000 {	; 运行域 ER_IROM1, 起始地址 0x08000000, 大小 0x0004000
+		*.o (RESET, +First) 			; 所有的 .o 文件, RESET放在最前面`优先(+First)`放这里
+		*(InRoot$$Sections)				; 库文件也放这里
+		.ANY (+RO)						; 所有`未指定`地址的 RO 数据放这里
+		.ANY (+XO)						; 所有`未指定`地址的 XI(代码) 数据放这里
+	}
+	RW_IRAM1 0x20000000 0x0000C000 {	; 运行域 RW_IRAM1, 起始地址 0x20000000, 大小 0x0000C000
+		.ANY (+RW +ZI)					; 所有`未指定`位置的 RW, ZI 数据放这里
+	}
+}
+```
+
+注释以分号开始。
+
+### 定义加载域与运行域
+
+一级大括号定义加载域，二级大括号定义运行域。加载域的大括号中只能写运行域定义，运行域的大括号中只能写输入节描述。不可以在加载域里写输入节描述，也不可以在运行域中定义运行域。
+
+```
+加载域 1 名称 起始地址 大小 属性 {
+	运行域 1 名称 起始地址 大小 属性 {
+		输入节描述
+	}
+
+	运行域 2 名称 起始地址 大小 属性 {
+		输入节描述
+	}
+}
+
+加载域 2 名称 起始地址 大小 属性 {
+	运行域 3 名称 起始地址 大小 属性 {
+		输入节描述
+	}
+
+	运行域 4 名称 起始地址 大小 属性 {
+		输入节描述
+	}
+}
+```
+
+大小可以省略（省略后默认为 4 GB），属性也可以省略。名称不能重复，区域不能重叠，起始地址必须8字节对齐（也就是8的整数倍）。这里的大小单位均为字节。
+
+### 加载域属性
+
+> [Load region attributes - ARM Compiler armlink User Guide Version 5.06](https://developer.arm.com/documentation/dui0474/m/scatter-file-syntax/load-region-descriptions/load-region-attributes)。
+
+### 运行域属性
+
+> [Execution region attributes - ARM Compiler armlink User Guide Version 5.06](https://developer.arm.com/documentation/dui0474/m/scatter-file-syntax/execution-region-descriptions/execution-region-attributes)。
+
+- `ABSOLUTE` 
+- `ALIGN x`，x字节对齐
+- `UNINIT`：即不要初始化运行域。这个属性在外部RAM中很重要，一般情况下，想要访问外部RAM需要初始化控制器，例如STM32外扩RAM通过FMC总线实现，使用前需要初始化FMC控制器，否则进入`HardFault`。默认情况下，定义的RAM块在进入`main`函数前会 Zero fill，也就是清零。这时候外部RAM还没有初始化，访问这块内存会直接进入`HardFault`
+
+### 输入节描述 (Input Section Description)
+
+> [Section-related symbols - ARM Compiler armlink User Guide Version 5.06](https://developer.arm.com/documentation/dui0474/m/accessing-and-managing-symbols-with-armlink/section-related-symbols?lang=en)
+>
+> [Input sections, output sections, regions, and program segments - ARM Compiler armlink User Guide Version 5.06](https://developer.arm.com/documentation/dui0474/m/image-structure-and-generation/the-structure-of-an-arm-elf-image/input-sections--output-sections--regions--and-program-segments)
+>
+> [Components of an input section description - ARM Compiler armlink User Guide Version 5.06](https://developer.arm.com/documentation/dui0474/m/scatter-file-syntax/input-section-descriptions/components-of-an-input-section-description)
+
+编译器编译完源代码生成的对象文件中包含代码、各种数据。这些都会标记为不同的属性，即`RO, RW, XO, ZI`，它们将会作为链接器的输入。我们需要知道编译器是如何描述它们的，才可以把数据和代码放在指定位置。
+
+输入节描述包含以下类型：
+
+- 模块文件名，包括对象文件(.o)，库文件(.lib)，可以使用通配符
+- 输入节名称或者属性，例如`READ_ONLY`或者`CODE`，可以使用通配符
+- 符号名称，主要是ARM Compiler内建的组件
+
+一个输入节描述构成如下：
+
+![输入节描述](/Embedded/input-description.svg)
+
+输入节描包括模块名称、输入节部分。
+
+### 
 
 ## 示例
 
