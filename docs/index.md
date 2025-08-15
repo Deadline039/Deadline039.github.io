@@ -25,7 +25,7 @@ hero:
 
 ---
 
-感谢一下作者提供的搭建教程与指南：
+感谢以下作者提供的搭建教程与指南：
 
 - [VitePress | 快速上手中文教程](https://vitepress.yiov.top/)
 
