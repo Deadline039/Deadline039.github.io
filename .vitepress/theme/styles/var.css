@@ -10,3 +10,11 @@ img {
     margin: auto;
     display: block;
 }
+
+th,
+td {
+    white-space: nowrap !important;
+    /* 不让th, td内容换行显示 */
+    width: 1%;
+    /* 强制均匀分配宽度 */
+}

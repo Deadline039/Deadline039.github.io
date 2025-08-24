@@ -43,7 +43,7 @@ LR_IROM1 0x08000000 0x00040000 {
 > [When to use scatter-loading - ARM Compiler armlink User Guide Version 5.06](https://developer.arm.com/documentation/dui0474/m/scatter-loading-features/the-scatter-loading-mechanism/when-to-use-scatter-loading?lang=en)
 
 - 复杂的存储布局：代码和数据必须明确指定存储区域
-- 多种存储类型：例如一个系统包含多种存储设备，如内部Flash、内部SRAM、高速SRAM、外部SDRAM、外部ROM等。这时候就需要sct文件去描述这些存储区域
+- 多种存储类型：例如一个系统包含多种存储区域，如内部Flash、内部SRAM、高速SRAM、外部SDRAM、外部ROM等。这时候就需要sct文件去描述这些存储区域
 - 地址映射的外设：例如FMC、QSPI等外设。通常扩展的SDRAM需要用到FMC，sct文件可以描述这些存储区域，并且可以很方便地访问
 - 固定常量内容位置：如果一些代码内容不会变化，且在一个固定的地址，不需要重新擦写（Flash擦写也是有寿命的）即使周围的程序已经修改后重新编译，这部分固定位置的代码不会受影响。这对一些GUI程序非常有用，图片、字库这类资源通常非常大，但是又不会经常修改，每次改代码重新编译不仅下载费时间，芯片频繁擦写还会导致Flash寿命变短
 - 指定堆栈位置：默认情况下，堆栈由链接器自动分配。可以手动指定堆栈的分配区域
@@ -66,12 +66,12 @@ LR_IROM1 0x08000000 0x00040000 {
 
 左侧是加载域视图；右侧是运行域视图。加载域中包含RO Section和RW Section，存储在ROM中；在上电后，先将加载域RW Section的数据复制或者解压到运行域SRAM中的RW Section中，SRAM中的ZI Section进行零填充，RO Section仍然在ROM区域，等待CPU调用。一个加载域可以包含多个运行域。
 
-在C程序中，程序段可以分为 .bbs, .text段等（[内存布局](/C/PtrMemory#内存布局)），在armlink中定义的数据类型以及他们对应的程序段如下：
+在C程序中，程序段可以分为 `.bbs`, `.text`段等（[内存布局](/C/PtrMemory#内存布局)），在armlink中定义的数据类型以及他们对应的程序段如下：
 
-- XO (Execute Only): 只执行数据，就是Code，对应 .text，即代码段，通常存储在ROM中
-- RO (Read Only) Data: 只读数据，对应 .rodata段，通常存储在ROM中，const修饰的静态变量
-- RW (Read and Write) Data: 可读写数据，对应 .data段，存储在RAM中，*赋初始值的*静态变量
-- ZI (Zero Initialized) Data: 初始零数据，对应 .bss段，存储在RAM中，静态变量区，与RW的区别在于ZI没有赋初始值，默认为0
+- XO (Execute Only): 只执行数据，就是Code，对应 `.text`，即代码段，通常存储在ROM中
+- RO (Read Only) Data: 只读数据，对应`.rodata`段，通常存储在ROM中，const修饰的静态变量
+- RW (Read and Write) Data: 可读写数据，对应`.data`段，存储在RAM中，*赋初始值的*静态变量
+- ZI (Zero Initialized) Data: 初始零数据，对应`.bss`段，存储在RAM中，静态变量区，与RW的区别在于ZI没有赋初始值，默认为0
 
 RW的初始值需要存储在ROM中，上电需要加载到RAM中，给变量赋初值。所以镜像大小等于Code + RO Data + RW Data。这就是ARM Compiler每次编译完成输出的信息：
 
@@ -95,7 +95,9 @@ Total ROM Size (Code + RO Data + RW Data)      19652 (  19.19kB)
 
 > [Optimization with RW data compression - ARM Compiler armlink User Guide Version 5.06](https://developer.arm.com/documentation/dui0474/i/using-linker-optimizations/working-with-rw-data-compression)
 
-当压缩后的RW-data + 解压缩程序大小<解压后的RW-data大小时，armlink会对RW-data压缩，在上电后解压到RAM中，例如上述工程1编译输出的大小就不匹配。所以实际镜像大小不完全等于Code + RO + RW。
+我们发现，上面工程1的`ROM Size != Code + RO Data + RW Data (32804 != 25340 + 2272 + 655520)`，这是怎么回事呢？原来是armlink会压缩RW-data。
+
+当`压缩后的RW-data + 解压缩程序大小 < 解压后的RW-data大小`时，armlink会对RW-data压缩，在上电后解压到RAM中。所以实际镜像大小不完全等于Code + RO + RW。
 
 可以使用`--datacompressor off`选项关闭压缩，关闭后编译工程1的信息如下：
 
@@ -189,11 +191,11 @@ LR_IROM1 0x08000000 0x00040000 {		; 加载域 LR_IROM1, 起始地址 0x08000000,
 
 大小可以省略（省略后默认为 4 GB），属性也可以省略。名称不能重复，区域不能重叠，起始地址必须8字节对齐（也就是8的整数倍）。这里的大小单位均为字节。
 
-### 加载域属性
+### 加载域 (Load region)
 
 > [Load region attributes - ARM Compiler armlink User Guide Version 5.06](https://developer.arm.com/documentation/dui0474/m/scatter-file-syntax/load-region-descriptions/load-region-attributes)。
 
-### 运行域属性
+### 运行域 (Execution region)
 
 > [Execution region attributes - ARM Compiler armlink User Guide Version 5.06](https://developer.arm.com/documentation/dui0474/m/scatter-file-syntax/execution-region-descriptions/execution-region-attributes)。
 
@@ -208,22 +210,105 @@ LR_IROM1 0x08000000 0x00040000 {		; 加载域 LR_IROM1, 起始地址 0x08000000,
 > [Input sections, output sections, regions, and program segments - ARM Compiler armlink User Guide Version 5.06](https://developer.arm.com/documentation/dui0474/m/image-structure-and-generation/the-structure-of-an-arm-elf-image/input-sections--output-sections--regions--and-program-segments)
 >
 > [Components of an input section description - ARM Compiler armlink User Guide Version 5.06](https://developer.arm.com/documentation/dui0474/m/scatter-file-syntax/input-section-descriptions/components-of-an-input-section-description)
+>
+>[Placement of ARM C and C++ library code - ARM Compiler armlink User Guide Version 5.06](https://developer.arm.com/documentation/dui0474/m/scatter-loading-features/placement-of-arm-c-and-c---library-code?lang=en)
 
-编译器编译完源代码生成的对象文件中包含代码、各种数据。这些都会标记为不同的属性，即`RO, RW, XO, ZI`，它们将会作为链接器的输入。我们需要知道编译器是如何描述它们的，才可以把数据和代码放在指定位置。
-
-输入节描述包含以下类型：
-
-- 模块文件名，包括对象文件(.o)，库文件(.lib)，可以使用通配符
-- 输入节名称或者属性，例如`READ_ONLY`或者`CODE`，可以使用通配符
-- 符号名称，主要是ARM Compiler内建的组件
+编译器编译完源代码生成的对象文件中包含代码、变量等各种不同类型的数据。这些都会标记为不同的属性，即`RO, RW, XO, ZI`，它们将会作为链接器的输入。我们需要知道编译器是如何描述它们的，才可以把数据和代码放在指定位置。
 
 一个输入节描述构成如下：
 
 ![输入节描述](/Embedded/input-description.svg)
 
-输入节描包括模块名称、输入节部分。
+输入节模块名可以是编译生成的对象文件(.o)，可以是库文件(.lib)。也可以是文件的路径，可以用引号包裹。
 
-### 
+可以使用通配符匹配文件，例如`*.o`，大小写不敏感。如果只写一个`*`，代表匹配所有对象文件和库。
+
+::: warning
+不可以在多个运行域中用`*`匹配，最好使用`.ANY`来代替。`*`的优先级比`.ANY`高。
+:::
+
+::: tip
+通常情况下，编译的对象文件名和源文件名称是一样的。如果一个工程中有重名的源文件，有些IDE（例如Keil）可能会加数字后缀来区分，这一点是需要注意的。
+![](/Embedded/keil-rename-obj.png)
+:::
+
+输入节属性也就是我们说的不同类型的数据，大小写不敏感，属性前需要一个加号，例如`+RO`
+
+| 属性名称  |  别名   |            说明            |
+| :-------: | :-----: | :------------------------: |
+| `RO-CODE` | `CODE`  |         RO代码部分         |
+| `RO-DATA` | `CONST` |       const常量部分        |
+|   `RO`    | `TEXT`  |  包括`RO-CODE`和`RO-DATA`  |
+| `RW-DATA` |         |     有初始值的静态变量     |
+| `RW-CODE` |         |         RW代码部分         |
+|   `RW`    | `DATA`  |  包括`RW-CODE`和`RW-DATA`  |
+|   `XO`    |         |         只执行部分         |
+|   `ZI`    |  `BSS`  |     无初始值的静态变量     |
+|  `ENTRY`  |         | 包括`ENTRY`入口点的section |
+
+还有两个伪属性`FIRST`和`LAST`。为什么叫伪属性呢？因为它不属于上述任何一种数据类型，它的作用是指定数据存放位置，不让链接器自动排序。`FIRST`是放在运行域的开头，`LAST`是放在运行域的末尾。需要注意，运行域中的`FIRST`和`LAST`只能个出现一次。
+
+下面是一个例子：
+
+``` ts {3,10,13-14}
+LR_IROM1 0x08000000 0x00040000 {
+	ER_IROM1 0x08000000 0x00040000 {
+		*.o (RESET, +First) // [!code focus] 
+		*(InRoot$$Sections) 
+		.ANY (+RO) 
+		.ANY (+XO) 
+	}
+	RW_IRAM1 0x20000000 0x0000C000 {
+		.ANY (+RW +ZI) 
+		main.o (+RO) // [!code focus]
+	}
+	RW_IRAM1 0x20001000 0x00001000 {
+		main.o (+ZI) // [!code focus]
+		"/path/to/example/lib/example.lib" (+RW +ZI) // [!code focus]
+	}
+}
+```
+
+这里第三行我们给`RESET`加了`First`，也就是将`RESET`放在`ER_IROM1`的开头处。而`RESET`是在启动文件中定义的中断向量表：
+
+``` asm {2}
+; Vector Table Mapped to Address 0 at Reset
+                AREA    RESET, DATA, READONLY
+                EXPORT  __Vectors
+                EXPORT  __Vectors_End
+                EXPORT  __Vectors_Size
+
+__Vectors       DCD     __initial_sp                      ; Top of Stack
+                DCD     Reset_Handler                     ; Reset Handler
+				...
+                DCD     SysTick_Handler                   ; SysTick Handler
+
+                ; External Interrupts
+                DCD     WWDG_IRQHandler                   ; Window WatchDog interrupt ( wwdg1_it)
+				...
+                DCD     WAKEUP_PIN_IRQHandler             ; Interrupt for all 6 wake-up pins 
+__Vectors_End
+
+__Vectors_Size  EQU  __Vectors_End - __Vectors
+
+                AREA    |.text|, CODE, READONLY
+```
+
+我们可以查看map文件来验证`RESET`是否在最开头：
+
+``` txt{6}
+Memory Map of the image
+  Image Entry point : 0x08000299
+  Load Region LR_IROM1 (Base: 0x08000000, Size: 0x000a76b0, Max: 0x80000000, ABSOLUTE, COMPRESSED[0x00009418])
+    Execution Region ER_IROM1 (Base: 0x08000000, Size: 0x00007604, Max: 0x00008000, ABSOLUTE)
+    Base Addr    Size         Type   Attr      Idx    E Section Name      Object
+    0x08000000   0x00000298   Data   RO        93     RESET               startup_stm32h743xx.o
+	...
+```
+
+除了我们编写的代码外，还有一些编译器内建组件，例如C/C++库函数。可以使用`*armlib*`或`*cpplib*`来指定。
+
+但是有些C库的section必须在根域，例如`__main.o`, `__scatter*.o`, `__dc*.o`, 和`*Region$$Table`。只需要用`InRoot$$Sections`，就可以可以让链接器自动指定存放位置。
 
 ## 示例
 
