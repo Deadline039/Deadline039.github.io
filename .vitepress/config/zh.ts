@@ -134,7 +134,7 @@ function sidebarEmbedded(): DefaultTheme.SidebarItem[] {
     return [
         { text: '这里有什么？', link: 'index.md' },
         { text: 'CMSIS配置向导标注', link: 'cmsis_config_wizard.md' },
-        { text: '分散加载文件', link: 'scatter.md' },
+        { text: 'armlink与分散加载文件', link: 'scatter.md' },
     ]
 }
 
