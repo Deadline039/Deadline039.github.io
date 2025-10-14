@@ -20,12 +20,11 @@ export const shared = defineConfig({
             { icon: 'github', link: 'https://github.com/Deadline039/' }
         ],
         footer: {
-            message: 'Powered by VitePress, deployed by Github & Vercel. ',
+            message: 'Powered by VitePress, deployed by Github. ',
         }
     },
 
     head: [
-        ["script", { src: "/_vercel/insights/script.js", defer: true }],
         ['link', { rel: 'icon', href: '/logo.ico' }],
     ],
 
